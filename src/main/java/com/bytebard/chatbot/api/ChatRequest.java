@@ -11,7 +11,7 @@ import com.openai.models.finetuning.jobs.JobListPage;
 import java.util.*;
 
 public final class ChatRequest {
-    private static String MODEL;
+//    private static String MODEL;
     private static OpenAIClient CLIENT = null;
 
 //    public ChatRequest(String apiKey, String modelName, Map<String, Object> result) throws OpenAIException {
@@ -34,17 +34,17 @@ public final class ChatRequest {
 //
 //        return;
 //    }
-    public static Map<String, Object> initChatRequest(String apiKey, String modelName) throws OpenAIException {
+    public static Map<String, Object> initChatRequest(String apiKey) throws OpenAIException {
         System.out.println("Start ChatRequest Initialize");
         Map<String, Object> result = new HashMap<>();
         try{
-            if(modelName == null || modelName.isEmpty()) throw new OpenAIException("modelName is null or empty");
+//            if(modelName == null || modelName.isEmpty()) throw new OpenAIException("modelName is null or empty");
             if(apiKey == null || apiKey.isEmpty()) throw new OpenAIException("apiKey is null or empty");
 
-            MODEL = modelName;
+//            MODEL = modelName;
             CLIENT = new OpenAIOkHttpClient.Builder().apiKey(apiKey).fromEnv().build();
 
-            result.put("model", MODEL);
+            result.put("model", "");
             result.put("status", "success");
             System.out.println("ChatRequest Initialize Success");
         } catch (OpenAIException e) {
@@ -65,7 +65,7 @@ public final class ChatRequest {
             jobInfo.put("id", job.id());
             jobInfo.put("model", job.model());
             jobInfo.put("fineTuneModel", job.fineTunedModel());
-            jobInfo.put("fineTunedModelToStr", job.fineTunedModel().orElse(null)); //API호출 시 모델 설정값에 넣는 정보
+            jobInfo.put("fineTuneModelToStr", job.fineTunedModel().orElse(null)); //API호출 시 모델 설정값에 넣는 정보
             jobInfo.put("status", job.status());
             jobInfo.put("createdAt", job.createdAt());
             jobInfo.put("finishedAt", job.finishedAt());
@@ -77,7 +77,6 @@ public final class ChatRequest {
             jobInfo.put("method", job.method());
             result.add(jobInfo);
         }
-        System.out.println("ChatRequest GetTuneModels");
 
         Map<String, Object> response = new HashMap<>();
         response.put("total", result.size());
@@ -85,12 +84,12 @@ public final class ChatRequest {
         return response;
     }
 
-    public static Map<String, Object> questionMessage(String questionMessage) throws OpenAIException {
+    public static Map<String, Object> questionMessage(String questionMessage, String fineTuneModel) throws OpenAIException {
         Map<String, Object> result = new HashMap<>();
         try {
             ChatCompletion chat = CLIENT.chat().completions().create(
                 ChatCompletionCreateParams.builder()
-                    .model(MODEL).addUserMessage(questionMessage).build()
+                    .model(fineTuneModel).addUserMessage(questionMessage).build()
             );
 
             result.put("status", "success");
